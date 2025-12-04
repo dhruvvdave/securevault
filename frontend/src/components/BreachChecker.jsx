@@ -40,8 +40,13 @@ function BreachChecker() {
     try {
       const response = await api.post('/breach/check-password', { password })
       setPasswordResult(response.data)
+      if (response.data.error) {
+        toast.error(response.data.error)
+      }
     } catch (error) {
-      toast.error('Failed to check password')
+      const errorMessage = error.response?.data?.error || 'Failed to check password'
+      toast.error(errorMessage)
+      setPasswordResult({ error: errorMessage })
     } finally {
       setLoading(prev => ({ ...prev, password: false }))
     }
@@ -168,7 +173,11 @@ function BreachChecker() {
             animate={{ opacity: 1, y: 0 }}
             className="mt-4"
           >
-            {passwordResult.breached ? (
+            {passwordResult.error ? (
+              <div className="p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-yellow-400">
+                {passwordResult.error}
+              </div>
+            ) : passwordResult.breached ? (
               <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
                 <div className="flex items-center space-x-2 text-red-400 mb-2">
                   <HiShieldExclamation className="w-5 h-5" />

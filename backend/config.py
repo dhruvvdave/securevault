@@ -34,7 +34,9 @@ class Config:
     
     # CORS settings
     # In production, set CORS_ORIGINS to your specific frontend URLs
-    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'http://localhost:5173,http://localhost:5001').split(',')
+    # Default to '*' to allow all origins (for development and initial deployment)
+    _cors_origins = os.environ.get('CORS_ORIGINS', '*')
+    CORS_ORIGINS = ['*'] if _cors_origins == '*' else _cors_origins.split(',')
     
     # HaveIBeenPwned API
     HIBP_API_KEY = os.environ.get('HIBP_API_KEY', '')

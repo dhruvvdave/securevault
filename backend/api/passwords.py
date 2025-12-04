@@ -127,14 +127,22 @@ def check_password_breach():
     
     password = data['password']
     
-    checker = BreachChecker()
-    result = checker.check_password(password)
-    
-    # Add hash info for educational purposes
-    hash_info = checker.get_password_hash_info(password)
-    result['hash_info'] = hash_info
-    
-    return jsonify(result), 200
+    try:
+        checker = BreachChecker()
+        result = checker.check_password(password)
+        
+        # Add hash info for educational purposes
+        hash_info = checker.get_password_hash_info(password)
+        result['hash_info'] = hash_info
+        
+        return jsonify(result), 200
+    except Exception as e:
+        current_app.logger.error(f"Password breach check error: {str(e)}")
+        return jsonify({
+            'breached': None,
+            'count': None,
+            'error': f'Service temporarily unavailable: {str(e)}'
+        }), 200  # Return 200 with error in body so frontend can display it
 
 
 @passwords_bp.route('/breach/check-email', methods=['POST'])

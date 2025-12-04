@@ -56,7 +56,7 @@ class BreachChecker:
         try:
             response = self.session.get(
                 f"{self.HIBP_PASSWORD_API}{prefix}",
-                timeout=10
+                timeout=30  # Increase timeout for slow connections
             )
             response.raise_for_status()
             
@@ -67,10 +67,11 @@ class BreachChecker:
                 if len(parts) == 2:
                     hash_suffix, count = parts
                     if hash_suffix == suffix:
+                        count_int = int(count)
                         return {
                             'breached': True,
-                            'count': int(count),
-                            'message': f'This password has been seen {count:,} times in data breaches!'
+                            'count': count_int,
+                            'message': f'This password has been seen {count_int:,} times in data breaches!'
                         }
             
             return {
@@ -78,7 +79,19 @@ class BreachChecker:
                 'count': 0,
                 'message': 'This password has not been found in known data breaches.'
             }
-            
+        
+        except requests.exceptions.Timeout:
+            return {
+                'breached': None,
+                'count': None,
+                'error': 'Request timed out. Please try again.'
+            }
+        except requests.exceptions.ConnectionError:
+            return {
+                'breached': None,
+                'count': None,
+                'error': 'Could not connect to breach database. Please try again.'
+            }
         except requests.exceptions.RequestException as e:
             return {
                 'breached': None,

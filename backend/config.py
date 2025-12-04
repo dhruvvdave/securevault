@@ -33,7 +33,8 @@ class Config:
     RATELIMIT_HEADERS_ENABLED = True
     
     # CORS settings
-    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'http://localhost:5173,http://localhost:5001,https://*.onrender.com').split(',')
+    # In production, set CORS_ORIGINS to your specific frontend URLs
+    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'http://localhost:5173,http://localhost:5001').split(',')
     
     # HaveIBeenPwned API
     HIBP_API_KEY = os.environ.get('HIBP_API_KEY', '')
